@@ -125,13 +125,13 @@
             const redPixel = imageData.data[index];
             const greenPixel = imageData.data[index + 1];
             const bluePixel = imageData.data[index + 2];
-            if (redPixel > 127 && greenPixel > 127 && bluePixel > 127) {
+            if (redPixel > 200 && greenPixel > 200 && bluePixel > 200) {
               whitePosition = [x, y];
             } else if (redPixel > 200) {
               redPosition = [x, y];
-            } else if (greenPixel > 127) {
+            } else if (greenPixel > 200) {
               greenPosition = [x, y];
-            } else if (bluePixel > 127) {
+            } else if (bluePixel > 200) {
               bluePosition = [x, y];
             }
           }
