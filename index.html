@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Pixel Extractor</title>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        color: rgba(0, 0, 0, .5);
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          'Open Sans',
+          'Helvetica Neue',
+          sans-serif;
+        font-weight: 700;
+      }
+
+      .view {
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        background: #98ddca;
+        overflow: auto;
+        padding: 72px;
+        box-sizing: border-box;
+      }
+
+      .view-center {
+        margin: auto;
+      }
+
+      label {
+        font-size: 48px;
+      }
+
+      input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .processing {
+        font-size: 14px;
+      }
+
+      #frame-number {
+        font-size: 150px;
+      }
+
+      #file-name {
+        font-size: 24px;
+        margin-left: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section class="view">
+      <pre id="result" class="view-center"></pre>
+    </section>
+
+    <section class="view" id="progress-view">
+      <div class="view-center">
+        <div id="file-name">hello.mp4</div>
+        <span id="frame-number">600</span>
+        <span class="processing">frames processed</span>
+      </div>
+    </section>
+
+    <section class="view" id="select-view">
+      <label for="video-input" class="view-center">
+        <div>Choose video</div>
+        <input type="file" id="video-input" accept="video/mp4">
+      </label>
+    </section>
+
+    <script>
+      const state = {
+        counter: 0,
+        ctx: null,
+        positions: [],
+      };
+
+      function createCanvas(video) {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        state.ctx = canvas.getContext('2d');
+      }
+
+      function handleVideoSeeked() {
+        document.getElementById('frame-number').innerText = state.counter;
+        state.counter += 1;
+
+        state.ctx.drawImage(this, 0, 0, this.videoWidth, this.videoHeight);
+        const imageData = state.ctx.getImageData(0, 0, this.videoWidth, this.videoHeight);
+
+        let redPosition = null;
+        let bluePosition = null;
+        let greenPosition = null;
+        let whitePosition = null;
+        for (let y = 0; y < this.videoHeight; y += 1) {
+          for (let x = 0; x < this.videoWidth; x += 1) {
+            const index = (y * this.videoWidth + x) * 4;
+            const redPixel = imageData.data[index];
+            const greenPixel = imageData.data[index + 1];
+            const bluePixel = imageData.data[index + 2];
+            if (redPixel > 127 && greenPixel > 127 && bluePixel > 127) {
+              whitePosition = [x, y];
+            } else if (redPixel > 127) {
+              redPosition = [x, y];
+            } else if (greenPixel > 127) {
+              greenPosition = [x, y];
+            } else if (bluePixel > 127) {
+              bluePosition = [x, y];
+            }
+          }
+        }
+        if (!redPosition || !bluePosition || !greenPosition || !whitePosition) {
+          state.positions.push({ red: [0, 0], green: [0, 0], blue: [0, 0], white: [0, 0] });
+        } else {
+          state.positions.push({ red: redPosition, green: greenPosition, blue: bluePosition, white: whitePosition });
+        }
+
+        if (this.currentTime < this.duration) {
+          this.currentTime += 1 / 30;
+        } else {
+          const buffer = state.positions
+            .map((val, index) => `${val.red[0]} ${val.red[1]} ${val.green[0]} ${val.green[1]} ${val.blue[0]} ${val.blue[1]} ${val.white[0]} ${val.white[1]}`)
+            .join('\n');
+          document.getElementById('result').innerText = buffer;
+          document.getElementById('progress-view').style.display = 'none';
+        }
+      }
+
+      function handleVideoLoaded() {
+        createCanvas(this);
+        this.addEventListener('seeked', handleVideoSeeked);
+        this.currentTime = 0;
+      }
+
+      function createVideo(file) {
+        const video = document.createElement('video');
+        video.addEventListener('loadeddata', handleVideoLoaded);
+        video.src = URL.createObjectURL(file);
+        video.load();
+      }
+
+      function handleVideoSelect() {
+        const file = this.files[0];
+        if (file) {
+          document.getElementById('file-name').innerText = file.name;
+          document.getElementById('select-view').style.display = 'none';
+          createVideo(file);
+        }
+      }
+
+      document.querySelector('input').addEventListener('change', handleVideoSelect);
+    </script>
+  </body>
+</html>
