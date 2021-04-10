@@ -9,6 +9,7 @@
       html,
       body {
         height: 100%;
+        background: #98ddca;
       }
 
       body {
@@ -35,10 +36,10 @@
         left: 0;
         width: 100%;
         display: flex;
-        background: #98ddca;
         overflow: auto;
         padding: 72px;
         box-sizing: border-box;
+        background: #98ddca;
       }
 
       .view-center {
@@ -71,6 +72,25 @@
         font-size: 24px;
         margin-left: 12px;
       }
+
+      #progress-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background-color: #76ac9c;
+        transition: width 100ms linear;
+      }
+
+      .inner-view {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+      }
     </style>
   </head>
 
@@ -80,10 +100,13 @@
     </section>
 
     <section class="view" id="progress-view">
-      <div class="view-center">
-        <div id="file-name">hello.mp4</div>
-        <span id="frame-number">600</span>
-        <span class="processing">frames processed</span>
+      <div id="progress-bar"></div>
+      <div class="inner-view">
+        <div class="view-center">
+          <div id="file-name"></div>
+          <span id="frame-number">0</span>
+          <span class="processing">frames processed</span>
+        </div>
       </div>
     </section>
 
@@ -108,8 +131,14 @@
         state.ctx = canvas.getContext('2d');
       }
 
+      function getProgressPercent(video, counter) {
+        return `${Math.floor(counter / (video.duration * 30) * 100)}%`;
+      }
+
       function handleVideoSeeked() {
         document.getElementById('frame-number').innerText = state.counter;
+        console.log(getProgressPercent(this, state.counter));
+        document.getElementById('progress-bar').style.width = getProgressPercent(this, state.counter);
         state.counter += 1;
 
         state.ctx.drawImage(this, 0, 0, this.videoWidth, this.videoHeight);
