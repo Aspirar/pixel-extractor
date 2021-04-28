@@ -202,10 +202,10 @@
         if (rXMin == null || bXMin == null || gXMin == null || wXMin == null) {
           state.positions.push({ red: [0, 0], green: [0, 0], blue: [0, 0], white: [0, 0] });
         } else {
-          redPosition = [(rXMin + rXMax) / 2, (rYMin + rYMax) / 2];
-          bluePosition = [(bXMin + bXMax) / 2, (bYMin + bYMax) / 2];
-          greenPosition = [(gXMin + gXMax) / 2, (gYMin + gYMax) / 2];
-          whitePosition = [(wXMin + wXMax) / 2, (wYMin + wYMax) / 2];
+          redPosition = [(rXMin + rXMax) / (2 * this.videoWidth), (rYMin + rYMax) / (2 * this.videoHeight)];
+          bluePosition = [(bXMin + bXMax) / (2 * this.videoWidth), (bYMin + bYMax) / (2 * this.videoHeight)];
+          greenPosition = [(gXMin + gXMax) / (2 * this.videoWidth), (gYMin + gYMax) / (2 * this.videoHeight)];
+          whitePosition = [(wXMin + wXMax) / (2 * this.videoWidth), (wYMin + wYMax) / (2 * this.videoHeight)];
           state.positions.push({ red: redPosition, green: greenPosition, blue: bluePosition, white: whitePosition });
         }
 
