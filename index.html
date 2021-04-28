@@ -148,6 +148,12 @@
         let bluePosition = null;
         let greenPosition = null;
         let whitePosition = null;
+
+        let rXMin, rXMax, rYMin, rYMax;
+        let bXMin, bXMax, bYMin, bYMax;
+        let gXMin, gXMax, gYMin, gYMax;
+        let wXMin, wXMax, wYMin, wYMax;
+
         for (let y = 0; y < this.videoHeight; y += 1) {
           for (let x = 0; x < this.videoWidth; x += 1) {
             const index = (y * this.videoWidth + x) * 4;
@@ -155,19 +161,51 @@
             const greenPixel = imageData.data[index + 1];
             const bluePixel = imageData.data[index + 2];
             if (redPixel > 200 && greenPixel > 200 && bluePixel > 200) {
-              whitePosition = [x, y];
+              if (!wXMin) wXMin = x;
+              if (!wXMax) wXMax = x;
+              if (!wYMin) wYMin = y;
+              if (!wYMax) wYMax = y;
+              if (x < wXMin) wXMin = x;
+              if (x > wXMax) wXMax = x;
+              if (y < wYMin) wYMin = y;
+              if (y > wYMax) wYMax = y;
             } else if (redPixel > 200 && greenPixel < 50 &&  bluePixel < 50) {
-              redPosition = [x, y];
+              if (!rXMin) rXMin = x;
+              if (!rXMax) rXMax = x;
+              if (!rYMin) rYMin = y;
+              if (!rYMax) rYMax = y;
+              if (x < rXMin) rXMin = x;
+              if (x > rXMax) rXMax = x;
+              if (y < rYMin) rYMin = y;
+              if (y > rYMax) rYMax = y;
             } else if (greenPixel > 200 && redPixel < 50 && bluePixel < 50) {
-              greenPosition = [x, y];
+              if (!gXMin) gXMin = x;
+              if (!gXMax) gXMax = x;
+              if (!gYMin) gYMin = y;
+              if (!gYMax) gYMax = y;
+              if (x < gXMin) gXMin = x;
+              if (x > gXMax) gXMax = x;
+              if (y < gYMin) gYMin = y;
+              if (y > gYMax) gYMax = y;
             } else if (bluePixel > 200 && redPixel < 50 && greenPixel < 50) {
-              bluePosition = [x, y];
+              if (!bXMin) bXMin = x;
+              if (!bXMax) bXMax = x;
+              if (!bYMin) bYMin = y;
+              if (!bYMax) bYMax = y;
+              if (x < bXMin) bXMin = x;
+              if (x > bXMax) bXMax = x;
+              if (y < bYMin) bYMin = y;
+              if (y > bYMax) bYMax = y;
             }
           }
         }
-        if (!redPosition || !bluePosition || !greenPosition || !whitePosition) {
+        if (rXMin == null || bXMin == null || gXMin == null || wXMin == null) {
           state.positions.push({ red: [0, 0], green: [0, 0], blue: [0, 0], white: [0, 0] });
         } else {
+          redPosition = [(rXMin + rXMax) / 2, (rYMin + rYMax) / 2];
+          bluePosition = [(bXMin + bXMax) / 2, (bYMin + bYMax) / 2];
+          greenPosition = [(gXMin + gXMax) / 2, (gYMin + gYMax) / 2];
+          whitePosition = [(wXMin + wXMax) / 2, (wYMin + wYMax) / 2];
           state.positions.push({ red: redPosition, green: greenPosition, blue: bluePosition, white: whitePosition });
         }
 
